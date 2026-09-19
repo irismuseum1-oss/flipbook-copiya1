@@ -1,105 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-	
-    <meta charset="utf-8">
-
-    <title></title>
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    
-
-    <meta name="Keywords" content="" />
-    <meta name="Description" content="" />
-    <meta name="Generator" content="[1stFlip Flipbook Creator for PC 2.7.32] at [http://www.1stflip.com]" />
-        
-    <meta property=”og:type” content="book"/>
-    <meta property="og:title" content="Flipbook" />
-    
-    <meta property="og:description" content="Click to view the flipbook." />
-                
-    
-	
-		
-
-	</script>
-    <style>
-		html,body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-		#openfl-content { background: #000000; width: 100%; height: 100%; }
-
-	</style>
-	
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Копия. Право на существование</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a1a;display:flex;flex-direction:column;align-items:center;min-height:100vh;font-family:Georgia,serif;overflow:hidden}
+#title-bar{color:#d4af37;text-align:center;padding:10px 20px;font-size:16px;background:#0d0d0d;width:100%;position:fixed;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
+#title-bar h1{font-size:18px;font-weight:normal;letter-spacing:1px}
+#title-bar p{font-size:12px;color:#888;margin-top:2px}
+#viewer-container{margin-top:70px;flex:1;display:flex;align-items:center;justify-content:center;width:100%;position:relative}
+#page-canvas{max-width:90vw;max-height:calc(100vh - 140px);box-shadow:0 4px 20px rgba(0,0,0,0.8);border-radius:2px;background:#fff}
+#nav-bar{position:fixed;bottom:0;width:100%;background:#0d0d0d;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:15px;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,0.5)}
+.nav-btn{background:#d4af37;color:#1a1a1a;border:none;padding:8px 18px;font-size:14px;cursor:pointer;border-radius:4px;font-family:Georgia,serif;transition:background 0.2s}
+.nav-btn:hover{background:#e8c84e}
+.nav-btn:disabled{background:#555;cursor:not-allowed;opacity:0.5}
+#page-info{color:#d4af37;font-size:14px;min-width:80px;text-align:center}
+#loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#d4af37;font-size:20px;z-index:200;text-align:center}
+.spinner{width:40px;height:40px;border:3px solid #555;border-top:3px solid #d4af37;border-radius:50%;animation:spin 1s linear infinite;margin:15px auto}
+@keyframes spin{100%{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
-	
-	<noscript>This webpage makes extensive use of JavaScript. Please enable JavaScript in your web browser to view this page.</noscript>
-	
-	<div id="openfl-content"></div>
-<script src="flipbookPc.js"></script>
-
-    <script type="text/javascript">
-       <div id="openfl-content"></div>
-<script src="flipbookPc.js"></script>
-
-<script type="text/javascript">
-    function getQueryVariable(variable) {
-        var query = window.location.search.substring(1);
-        if(query) {
-            var vars = query.split("&");
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split("=");
-                if(pair == variable) {
-                    return pair;
-                }
-            }
-        }
-        return false;
-    }
-
-    var latest = getQueryVariable('latest');
-    var url = './flipbookMobile.js';
-    if(latest) {
-        url = "./flipbookMobile.js?latest=" + latest;
-    }
-
-    var mainJs = window.document.createElement('script');
-    mainJs.src = url;
-    mainJs.onload = function() {
-        lime.embed("flipbookMobile", "openfl-content", 0, 0, { parameters: {} });
-    };
-    window.document.head.appendChild(mainJs);
+<div id="title-bar"><h1>Копия. Право на существование</h1><p>Каталог выставки</p></div>
+<div id="loading"><div class="spinner"></div>Загрузка книги...</div>
+<div id="viewer-container"><canvas id="page-canvas"></canvas></div>
+<div id="nav-bar">
+<button class="nav-btn" id="prev-btn" onclick="prevPage()">&#8592; Назад</button>
+<span id="page-info">1 / -</span>
+<button class="nav-btn" id="next-btn" onclick="nextPage()">Вперёд &#8594;</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,currentPage=1,totalPages=0,rendering=false,pendingPage=null;
+pdfjsLib.getDocument("book.pdf").promise.then(function(doc){
+pdfDoc=doc;totalPages=doc.numPages;
+document.getElementById("page-info").textContent="1 / "+totalPages;
+document.getElementById("loading").style.display="none";
+renderPage(1);
+}).catch(function(error){
+document.getElementById("loading").innerHTML='<p style="color:#ff6666">Не удалось загрузить PDF.</p><p style="color:#888;font-size:14px">Убедитесь, что файл book.pdf рядом с index.html</p>';
+});
+function renderPage(num){
+if(rendering){pendingPage=num;return;}
+rendering=true;
+pdfDoc.getPage(num).then(function(page){
+var canvas=document.getElementById("page-canvas");
+var ctx=canvas.getContext("2d");
+var cw=document.getElementById("viewer-container").clientWidth*0.9;
+var ch=(window.innerHeight-140)*0.95;
+var vp1=page.getViewport({scale:1});
+var scale=Math.min(cw/vp1.width,ch/vp1.height);
+var vp=page.getViewport({scale:scale});
+canvas.width=vp.width;canvas.height=vp.height;
+page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+rendering=false;currentPage=num;
+document.getElementById("page-info").textContent=num+" / "+totalPages;
+document.getElementById("prev-btn").disabled=(num<=1);
+document.getElementById("next-btn").disabled=(num>=totalPages);
+if(pendingPage!==null){var p=pendingPage;pendingPage=null;renderPage(p);}
+});
+});
+}
+function prevPage(){if(currentPage>1)renderPage(currentPage-1);}
+function nextPage(){if(currentPage<totalPages)renderPage(currentPage+1);}
+document.addEventListener("keydown",function(e){if(e.key==="ArrowLeft")prevPage();if(e.key==="ArrowRight")nextPage();});
+var tx=0;
+document.addEventListener("touchstart",function(e){tx=e.touches[0].clientX;});
+document.addEventListener("touchend",function(e){var d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>50){if(d>0)nextPage();else prevPage();}});
 </script>
-
-    <script type=text/javascript>
-//put your JavaScript code here
-</script>
-    <script type="text/javascript">
-
-	var googleAcountID="";
-
-  var _gaq = _gaq || [];
-
-  _gaq.push(['_setAccount', googleAcountID]);
-
-  _gaq.push(['_trackPageview']);
-
-
-
-  (function() {
-
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-
-  })();
-
-
-
-</script>    
 </body>
 </html>
