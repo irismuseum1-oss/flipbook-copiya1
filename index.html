@@ -41,31 +41,38 @@
 <script src="flipbookPc.js"></script>
 
     <script type="text/javascript">
-       function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    if(query) {
-        var vars = query.split("&");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if(pair == variable) {
-                return pair;
+       <div id="openfl-content"></div>
+<script src="flipbookPc.js"></script>
+
+<script type="text/javascript">
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        if(query) {
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if(pair == variable) {
+                    return pair;
+                }
             }
         }
+        return false;
     }
-    return false;
-}
-        var latest = getQueryVariable('latest');
-        var url = './flipbookMobile.js';
-        if(latest){
-            url =  "./flipbookMobile.js?latest="+latest;
-        }
-        var mainJs = window.document.createElement('script');
-        mainJs.src = url;
-        mainJs.onload = function(){
-            lime.embed ("flipbookMobile", "openfl-content", 0, 0, { parameters: {} });
-        }
-        window.document.head.appendChild(mainJs);
-    </script>
+
+    var latest = getQueryVariable('latest');
+    var url = './flipbookMobile.js';
+    if(latest) {
+        url = "./flipbookMobile.js?latest=" + latest;
+    }
+
+    var mainJs = window.document.createElement('script');
+    mainJs.src = url;
+    mainJs.onload = function() {
+        lime.embed("flipbookMobile", "openfl-content", 0, 0, { parameters: {} });
+    };
+    window.document.head.appendChild(mainJs);
+</script>
+
     <script type=text/javascript>
 //put your JavaScript code here
 </script>
