@@ -18,7 +18,7 @@
             align-items: center;
             padding: 0 20px;
             z-index: 10;
-            border-bottom: 2px solid #d4af37; /* Золотая линия */
+            border-bottom: 2px solid #d4af37;
         }
         .header h1 { margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
         .pdf-container {
@@ -58,8 +58,8 @@
         <h1>Копия. Право на существование</h1>
     </div>
     <div class="pdf-container">
-        <!-- Ссылка на твой PDF файл -->
-        <iframe id="pdfFrame" src="book.pdf#toolbar=0&navpanes=0&view=FitH" allowfullscreen></iframe>
+        <!-- Исправленная ссылка: без лишних параметров -->
+        <iframe id="pdfFrame" src="book.pdf" allowfullscreen></iframe>
     </div>
     <div class="controls">
         <button onclick="prevPage()">← Назад</button>
@@ -69,11 +69,11 @@
     <script>
         const pdfFrame = document.getElementById('pdfFrame');
         let currentPage = 1;
-        const totalPages = 72; // Твое число страниц
+        const totalPages = 72;
 
         function updatePdf(page) {
-            // Формируем ссылку с нужным номером страницы
-            pdfFrame.src = `book.pdf#toolbar=0&navpanes=0&view=FitH&page=\${page}`;
+            // Теперь мы меняем страницу через JS, а не через параметры в src
+            pdfFrame.src = `book.pdf#page=\${page}`;
         }
 
         function nextPage() {
@@ -90,7 +90,6 @@
             }
         }
 
-        // Обработка клавиш на клавиатуре
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') nextPage();
             if (e.key === 'ArrowLeft') prevPage();
